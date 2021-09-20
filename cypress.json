@@ -1,0 +1,8 @@
+{
+    "baseUrl": "https://dev-my.excitel.com/api/selfcare/public/index_dev.php",
+    "env": {
+        "username": "devtestuser2",
+        "password": "123456"        
+    }
+    
+}

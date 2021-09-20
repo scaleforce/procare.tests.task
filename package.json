@@ -1,0 +1,22 @@
+{
+  "name": "procare.tests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "open": "cypress open",
+    "run": "cypress run --config video=false",
+    "run_video": "cypress run"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@bahmutov/cy-api": "^1.5.0",
+    "cypress": "^7.3.0"
+  },
+  "dependencies": {
+    "mysql": "github:mysqljs/mysql",
+    "uuid": "^8.3.2"
+  }
+}

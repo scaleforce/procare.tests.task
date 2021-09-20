@@ -1,0 +1,1488 @@
+swagger: '2.0'
+info:
+  description: |
+    This API is for Excitel SelfCare ERP system
+  version: 1.0.0
+  title: SELFCARE API
+paths:
+  /login:
+    post:
+      tags:
+        - authentication
+      summary: Authenticates subscriber
+      operationId: login
+      consumes:
+        - application/x-www-form-urlencoded
+      produces:
+        - application/json
+      parameters:
+        - name: username
+          in: formData
+          description: Subscriber username
+          required: true
+          type: string
+        - name: password
+          in: formData
+          description: Subscriber password
+          required: true
+          type: string
+        - name: isMyExcitel
+          in: formData
+          description: isMyExcitel
+          required: false
+          type: string
+      responses:
+        200:
+          description: successful login
+          schema:
+            type: object
+            properties:
+              messages:
+                $ref: '#/definitions/messages'
+              result:
+                allOf:
+                  - $ref: '#/definitions/currentTime'
+                  - $ref: '#/definitions/currentVersion'
+                  - type: object
+                    properties:
+                      subscriberData:
+                        $ref: '#/definitions/subscriberData'
+                  - $ref: '#/definitions/user'
+              status:
+                $ref: '#/definitions/status'
+              success:
+                $ref: '#/definitions/success'
+            required:
+              - result
+              - status
+              - success
+        400:
+          description: Invalid username or password
+          schema:
+            type: object
+            properties:
+              messages:
+                $ref: '#/definitions/messages'
+              status:
+                $ref: '#/definitions/status'
+              success:
+                $ref: '#/definitions/success'
+            required:
+              - messages
+              - status
+              - success
+  /subscriber/showProfile:
+    post:
+      tags:
+        - subscriber
+      summary: Shows subscriber profile data
+      operationId: showProfile
+      consumes:
+        - application/x-www-form-urlencoded
+      produces:
+        - application/json
+      parameters:
+        - name: subscriberId
+          in: query
+          required: true
+          type: integer
+      responses:
+        200:
+          description: success
+          schema:
+            type: object
+            properties:
+              messages:
+                $ref: '#/definitions/messages'
+              status:
+                $ref: '#/definitions/status'
+              success:
+                $ref: '#/definitions/success'
+              result:
+                allOf:
+                  - $ref: '#/definitions/currentTime'
+                  - $ref: '#/definitions/currentVersion'
+                  - $ref: '#/definitions/user'
+                  - $ref: '#/definitions/salesRepresentatives'
+                  - $ref: '#/definitions/onuDeviceData'
+                  - $ref: '#/definitions/otpValidationData'
+                  - $ref: '#/definitions/isPrimaryPhoneVerificationRequested'
+                  - $ref: '#/definitions/startPhoneVerificationProcess'
+                  - type: object
+                    properties:
+                      subscriberData:
+                        $ref: '#/definitions/subscriberData'
+            required:
+              - messages
+              - status
+              - success
+        400:
+          $ref: '#/responses/invalidInput'
+        401:
+          $ref: '#/responses/unauthorized'
+        404:
+          $ref: '#/responses/unauthorized'
+  /subscriber/changeEmail:
+    post:
+      tags:
+        - subscriber
+      summary: Change email.
+      operationId: changeEmail
+      consumes:
+        - application/x-www-form-urlencoded
+      produces:
+        - application/json
+      parameters:
+        - name: email
+          in: formData
+          type: string
+          allowEmptyValue: false
+          required: true
+        - name: subscriberId
+          in: formData
+          required: true
+          type: integer
+      responses:
+        200:
+          description: successfull change of email
+          schema:
+            type: object
+            properties:
+              messages:
+                $ref: '#/definitions/messages'
+              result:
+                allOf:
+                  - $ref: '#/definitions/currentTime'
+                  - $ref: '#/definitions/currentVersion'
+                  - $ref: '#/definitions/user'
+                  - type: object
+                    properties:
+                      ticketId:
+                        type: integer
+              status:
+                $ref: '#/definitions/status'
+              success:
+                $ref: '#/definitions/success'
+            required:
+              - messages
+              - result
+              - status
+              - success
+        400:
+          $ref: '#/responses/invalidInput'
+        401:
+          $ref: '#/responses/unauthorized'
+        404:
+          $ref: '#/responses/dataNotFound'
+definitions:
+  status:
+    type: object
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+  success:
+    type: boolean
+  user:
+    type: object
+    properties:
+      user:
+        type: object
+        properties:
+          balance:
+            type: array
+            items:
+              type: object
+          tabs:
+            type: object
+          token:
+            type: string
+  currentTime:
+    type: object
+    properties:
+      currentTime:
+        type: string
+  currentVersion:
+    type: object
+    properties:
+      currentVersion:
+        type: string
+  employeeLoginData:
+    type: object
+    properties:
+      employeeId:
+        type: integer
+      username:
+        type: string
+      firstName:
+        type: string
+      middleName:
+        type: string
+      lastName:
+        type: string
+      partnerId:
+        type: integer
+      employeeErpId:
+        type: string
+      employeeType:
+        type: integer
+      roleId:
+        type: integer
+      reportingTo:
+        type: integer
+      name:
+        type: string
+      teamIds:
+        type: array
+        items:
+          type: integer
+      positionName:
+        type: string
+      extTeamIds:
+        type: array
+        items:
+          type: integer
+      partnerIds:
+        type: array
+        items:
+          type: integer
+      accesses:
+        type: object
+        properties:
+          canDoCashRenewal:
+            type: boolean
+          canDoSales:
+            type: boolean
+          canDoCollection:
+            type: boolean
+          canDoRepair:
+            type: boolean
+          canDoFeasibility:
+            type: boolean
+          canDoInstallation:
+            type: boolean
+          canAssignToOthers:
+            type: boolean
+  subtab:
+    type: object
+    properties:
+      title:
+        type: string
+      url:
+        type: string
+      module:
+        type: string
+      method:
+        type: string
+  employeeData:
+    type: object
+    properties:
+      employeeId:
+        type: integer
+      identityId:
+        type: integer
+      username:
+        type: string
+      firstName:
+        type: string
+      middleName:
+        type: string
+      lastName:
+        type: string
+      partnerId:
+        type: integer
+      employeeErpId:
+        type: string
+      employeeType:
+        type: integer
+      email:
+        type: string
+      phone:
+        type: string
+      address:
+        type: string
+      city:
+        type: string
+      state:
+        type: string
+      postalCode:
+        type: string
+      rating:
+        type: integer
+      businessOwner:
+        type: string
+      partnerName:
+        type: string
+      partnerErpId:
+        type: string
+      partnerIdentityId:
+        type: integer
+      statusTitle:
+        type: string
+      lastPasswordChange:
+        type: string
+      forcePasswordChange:
+        type: integer
+      reportingToIdentityId:
+        type: integer
+      roleId:
+        type: integer
+      reportingTo:
+        type: integer
+      statusId:
+        type: integer
+      name:
+        type: string
+      positionName:
+        type: string
+      positionCode:
+        type: string
+      positionId:
+        type: integer
+      teamIds:
+        type: array
+        items:
+          type: integer
+      canReassignToOtherEmployees:
+        type: boolean
+      accesses:
+        type: object
+        properties:
+          canSync:
+            type: boolean
+          canSeeAddress:
+            type: boolean
+          canChangePassword:
+            type: boolean
+          canChangePhone:
+            type: boolean
+          canChangeName:
+            type: boolean
+          canChangeEmail:
+            type: boolean
+          canChangeProcareAccesses:
+            type: boolean
+          canResetPassword:
+            type: boolean
+      subtabs:
+        type: array
+        items:
+          $ref: "#/definitions/subtab"
+  employeeByPartner:
+    type: object
+    properties:
+      employeeId:
+        type: integer
+      employeeUsername:
+        type: string
+      employeeErpId:
+        type: string
+      businessOwner:
+        type: string
+      contactType:
+        type: string
+      employeeName:
+        type: string
+      name:
+        type: string
+      employeePhone:
+        type: string
+      employeeEmail:
+        type: string
+      roleId:
+        type: integer
+      status_id:
+        type: integer
+      lastLoginWeb:
+        type: string
+      lastLoginMobile:
+        type: integer
+      employeeRole:
+          type: string
+  employeesByPartner:
+    type: array
+    title: employees
+    items:
+      $ref: "#/definitions/employeeByPartner"
+  employeeByTeam:
+    type: object
+    properties:
+      employeeId:
+        type: integer
+      employeeTypeId:
+        type: integer
+      employeeUsername:
+        type: string
+  employeesByTeam:
+    type: array
+    title: employeeList
+    items:
+      $ref: "#/definitions/employeeByTeam"
+  excitelEmployeeDashboardData:
+    type: object
+    properties:
+      employeeData:
+        type: object
+        properties:
+          activeTicketsPerReason:
+            type: object
+            properties:
+              reasons:
+                type: array
+                items:
+                  type: object
+              totalTicketsByReason:
+                type: string
+          complaintStatus:
+              $ref: "#/definitions/sampleComplaintStatusObj"
+          dailyTicketsPerStatus:
+            type: object
+            properties:
+              statuses:
+                type: array
+                items:
+                  type: object
+              totalDailyTickets:
+                type: string
+          isExcitelEmployee:
+            type: boolean
+  partnerEmployeeDashboardData:
+    type: object
+    properties:
+      employeeData:
+        type: object
+        properties:
+          complaintStatus:
+            type: object
+            properties:
+              moneyPickup:
+                $ref: "#/definitions/sampleComplaintStatusObj"
+              noConnectivity:
+                $ref: "#/definitions/sampleComplaintStatusObj"
+          isExcitelEmployee:
+            type: boolean
+          renewalStats:
+            type: array
+            items:
+              type: object
+          subscribersByStatus:
+            type: array
+            items:
+              type: object
+          ticketsTotals:
+            type: array
+            items:
+              type: object
+  sampleComplaintStatusObj:
+    type: object
+    properties:
+      periods:
+        type: array
+        items:
+          type: object
+      totalTicketsOfComplaint:
+        type: string
+      where:
+        type: array
+        items:
+          type: object
+  ticketData:
+    type: object
+    properties:
+      ticketData:
+        type: object
+        properties:
+          accesses:
+            type: object
+            properties:
+              canChangeReason:
+                type: boolean
+              canChangeResolution:
+                type: boolean
+              canChangeStatus:
+                type: boolean
+              canComment:
+                type: boolean
+              canDetachFromMaster:
+                type: boolean
+              canReAssignToEmployee:
+                type: boolean
+              canReAssignTeam:
+                type: boolean
+              canUploadAttachments:
+                type: boolean
+              canWatch:
+                type: boolean
+          affectedPartners:
+            type: array
+            items:
+              type: object
+          appointment:
+            type: string
+          assignedToEmployee:
+            type: object
+            properties:
+              current:
+                type: object
+              possibleEmployees:
+                type: array
+                items:
+                  type: object
+          assignedToTeam:
+            type: object
+            properties:
+              current:
+                type: object
+              possibleTeams:
+                type: array
+                items:
+                  type: object
+          atLocation:
+            type: string
+          attachments:
+            type: array
+            items:
+              type: object
+          canEdit:
+            type: boolean
+          childCount:
+            type: string
+          commentTemplate:
+            $ref: '#/definitions/addCommentTemplate'
+          comments:
+            type: array
+            items:
+              $ref: '#/definitions/showCommentTemplate'
+          creationDate:
+            type: string
+          creator:
+            type: object
+            properties:
+              creatorId:
+                type: string
+              creatorName:
+                type: string
+              creatorUserType:
+                type: string
+              creatorUsername:
+                type: string
+          description:
+            type: string
+          etr:
+            $ref: '#/definitions/etr'
+          etrDate:
+            type: string
+          isActive:
+            type: boolean
+          isChild:
+            type: boolean
+          isClosed:
+            type: boolean
+          masterTicketId:
+            type: integer
+          partnerId:
+            type: integer
+          pendingPartnerStatusId:
+            type: integer
+          possibleStatusId:
+            type: integer
+          reason:
+            type: object
+            properties:
+              current:
+                $ref: '#/definitions/simpleDropDownStructure'
+              possibleReasons:
+                type: array
+                items:
+                  $ref: '#/definitions/simpleDropDownStructure'
+          showChildCount:
+            type: boolean
+          showEtrDate:
+            type: boolean
+          status:
+            type: object
+            properties:
+              current:
+                $ref: '#/definitions/simpleDropDownStructure'
+              possibleStatuses:
+                type: array
+                items:
+                  $ref: '#/definitions/simpleDropDownStructure'
+          tempFields:
+            type: object
+          ticketActionLog:
+            type: array
+            items:
+              $ref: '#/definitions/actionLogItem'
+          ticketId:
+            type: integer
+          title:
+            type: string
+          type:
+            type: object
+          uploadsUrl:
+            type: string
+  ticketDataForList:
+    type: object
+    properties:
+      address:
+        type: string
+      appointment:
+        type: string
+      assignedToEmployee:
+        type: string
+      assignedToTeam:
+        type: string
+      creationDate:
+        type: string
+      creatorId:
+        type: integer
+      creatorName:
+        type: string
+      creatorUsername:
+        type: string
+      email:
+        type: string
+      etrAlarm:
+        type: boolean
+      etrDate:
+        type: string
+      isAttachToMasterPermitted:
+        type: boolean
+      lastChangeDate:
+        type: string
+      lastComment:
+        type: object
+      masterTicketId:
+        type: integer
+      name:
+        type: string
+      partnerId:
+        type: integer
+      partnerName:
+        type: integer
+      phoneNumber:
+        type: string
+      reason:
+        type: string
+      reasonId:
+        type: integer
+      serviceExpirationDate:
+        type: string
+      status:
+        type: object
+      statusId:
+        type: integer
+  addCommentTemplate:
+    type: object
+    properties:
+      attachements:
+        type: array
+        items:
+          type: object
+      description:
+        type: string
+      showOptions:
+        type: boolean
+      subresolutionId:
+        type: integer
+      visibilityLevel:
+        type: integer
+  showCommentTemplate:
+      type: object
+      properties:
+        attachements:
+          type: array
+          items:
+            type: object
+        authorId:
+          type: string
+        authorUserType:
+          type: string
+        authorUsername:
+          type: string
+        creationDate:
+          type: string
+        description:
+          type: string
+        visibilityLevel:
+          type: integer
+  actionLogItem:
+    type: object
+    properties:
+      byUser:
+        type: string
+      events:
+        type: array
+        items:
+          type: object
+          properties:
+            action:
+              type: string
+            byUser:
+              type: string
+            isSusbcriber:
+              type: boolean
+            masterAction:
+              type: boolean
+            onDate:
+              type: string
+            previousState:
+              type: string
+            userId:
+              type: integer
+      isComment:
+        type: boolean
+      isSusbcriber:
+        type: boolean
+      masterAction:
+        type: boolean
+      onDate:
+        type: string
+      userId:
+        type: integer
+  ticketList:
+    type: object
+    properties:
+      ticketList:
+        type: array
+        items:
+          $ref: '#/definitions/ticketDataForList'
+  etr:
+    type: object
+    properties:
+      hours:
+        type: array
+        items:
+          type: string
+      min:
+        type: array
+        items:
+          type: string
+  simpleDropDownStructure:
+    type: object
+    properties:
+      id:
+        type: integer
+        minimum: 1
+      title:
+        type: string
+  reasons:
+    type: array
+    items:
+      $ref: '#/definitions/simpleDropDownStructure'
+  sourceChannels:
+    type: array
+    items:
+      $ref: '#/definitions/simpleDropDownStructure'
+  ticketTypes:
+    type: array
+    items:
+      $ref: '#/definitions/simpleDropDownStructure'
+  minMax:
+    type: object
+    properties:
+      min:
+        type: integer
+      max:
+        type: integer
+  ticketRestrictions:
+    type: object
+    properties:
+      comment:
+        $ref: '#/definitions/minMax'
+      description:
+        $ref: '#/definitions/minMax'
+      file:
+        type: object
+        properties:
+          max:
+            type: integer
+          types:
+            type: array
+            items:
+              type: string
+          typesLong:
+            type: array
+            items:
+              type: string
+      phoneNumber:
+        $ref: '#/definitions/minMax'
+      title:
+        $ref: '#/definitions/minMax'
+  message:
+    type: object
+    properties:
+      id:
+        type: integer
+      onClickData:
+        type: object
+        properties:
+          data:
+            type: object
+            properties:
+              id:
+                type: integer
+              tabId:
+                type: string
+                enum: ['ticketId', 'installationId', 'subscriberId']
+              title:
+                type: string
+          url:
+            type: string
+      silent:
+        type: boolean
+      text:
+        type: string
+      type:
+        type: string
+        enum: ['success', 'error', 'info', 'warning']
+  messages:
+    type: array
+    items:
+      $ref: '#/definitions/message'
+  installationData:
+    type: object
+    properties:
+      accesses:
+        type: object
+        properties:
+          canChangeRefCode:
+            type: boolean
+          canFinishInstallation:
+            type: boolean
+          canReAssignEmployee:
+            type: boolean
+          canRejectInstallation:
+            type: boolean
+          canResetSubscriberCPEPassword:
+            type: boolean
+      appointment:
+        type: string
+      assignedToEmployee:
+        type: object
+        properties:
+          current:
+            type: object
+          possibleEmployees:
+            type: array
+            items:
+              type: object
+      attachments:
+        type: string
+      closingDate:
+        type: string
+      creationDate:
+        type: string
+      creatorId:
+        type: string
+      creatorName:
+        type: string
+      creatorUserType:
+        type: string
+      creatorUsername:
+        type: string
+      description:
+        type: string
+      dueDate:
+        type: string
+      employeeUsername:
+        type: string
+      lastChangeDate:
+        type: string
+      masterTicketId:
+        type: integer
+      phoneId:
+        type: integer
+      priorityId:
+        type: integer
+      reasonId:
+        type: integer
+      resolutionId:
+        type: integer
+      scheduledFor:
+        type: string
+      serviceExpirationDate:
+        type: string
+      serviceLastRenewalDate:
+        type: string
+      serviceName:
+        type: string
+      serviceTypeId:
+        type: integer
+      solvedOnDate:
+        type: string
+      sourceChannelId:
+        type: integer
+      statusId:
+        type: integer
+      subscriberId:
+        type: integer
+      ticketId:
+        type: integer
+      ticketTypeId:
+        type: integer
+      title:
+        type: string
+  installationDataForList:
+    type: object
+    properties:
+      address:
+        type: string
+      assignedToEmployee:
+        type: string
+      installationId:
+        type: integer
+      name:
+        type: string
+      primaryPhone:
+        type: string
+      subscriberUsername:
+        type: string
+  installationsList:
+    type: object
+    properties:
+      installationsList:
+        type: array
+        items:
+          $ref: '#/definitions/installationDataForList'
+  subscriberData:
+    type: object
+    properties:
+      username:
+        type: string
+      subscriberId:
+        type: integer
+      firstName:
+        type: string
+      middleName:
+        type: string
+      lastName:
+        type: string
+      partnerId:
+        type: integer
+      email:
+        type: string
+        format: email
+      primaryPhone:
+        type: string
+      lastUsedPhoneId:
+        type: integer
+      lastUsedPhoneNumber:
+        type: integer
+      city:
+        type: string
+      state:
+        type: string
+      postalCode:
+        type: integer
+      address:
+        type: string
+      avatar:
+        type: string
+      serviceName:
+        type: string
+      serviceLastRenewalDate:
+        type: string
+      serviceExpirationDate:
+        type: string
+      status:
+        type: string
+      accountStatus:
+        type: string
+      locationRegionId:
+        type: integer
+      salesRepresentativeId:
+        type: integer
+      locationSubregionId:
+        type: integer
+      subscriberErpId:
+        type: string
+      erpCreationDate:
+        type: string
+      servicePrice:
+        type: string
+      serviceValidity:
+        type: string
+      internetBandwidth:
+        type: integer
+      peeringBandwidth:
+        type: integer
+      cafId:
+        type: integer
+      cafDate:
+        type: string
+      refCode:
+        type: string
+      comment:
+        type: string
+      primaryPhoneConfirmed:
+        type: integer
+      primaryPhoneConfirmationDate:
+        type: string
+      previousPhoneNumbers:
+        type: array
+        items:
+          type: object
+          properties:
+            phoneId:
+              type: integer
+            phoneNumber:
+              type: string
+            subscriberId:
+              type: integer
+      partnerName:
+        type: string
+      name:
+        type: string
+      subscriberCreatedBy:
+        type: string
+      creationDate:
+        type: string
+      serviceStatus:
+        type: object
+        properties:
+          title:
+            type: string
+          color:
+            type: string
+          remainingActiveDays:
+            type: string
+      macAddress:
+        type: string
+      onlineStatus:
+        type: object
+        properties:
+          title:
+            type: string
+          color:
+            type: string
+          statusSince:
+            type: string
+          statusChangeDate:
+            type: string
+      salesRepresentative:
+        type: string
+      subscriberCPEPassword:
+        type: string
+  service:
+    type: object
+    properties:
+      canCollectMoney:
+        type: boolean
+      deactivateCancellationButton:
+        type: boolean
+      internetBandwidth:
+        type: integer
+      isCancellable:
+        type: boolean
+      orderAmount:
+        type: string
+      orderAmountWithCharge:
+        type: string
+      peeringBandwidth:
+        type: string
+      serviceActivationDate:
+        type: string
+      serviceExpirationDate:
+        type: string
+      serviceName:
+        type: string
+      serviceState:
+        type: object
+        properties:
+          color:
+            type: string
+          title:
+            type: string
+      serviceValidity:
+        type: string
+      voucherSerialNo:
+        type: string
+  servicePaymentData:
+    type: object
+    properties:
+      citrus:
+        type: object
+      current:
+        type: boolean
+      extraCharges:
+        type: boolean
+      internetBandwidth:
+        type: integer
+      orderAmount:
+        type: string
+      orderAmountWithCharge:
+        type: string
+      payTM:
+        type: object
+      peeringBandwidth:
+        type: string
+      serviceActivationDate:
+        type: string
+      serviceExpirationDate:
+        type: string
+      serviceName:
+        type: string
+      serviceValidity:
+        type: string
+  serviceModification:
+    type: object
+    properties:
+      date:
+        type: string
+      operation:
+        type: string
+      label:
+        type: string
+      employeeUsername:
+        type: string
+  serviceModifications:
+    type: array
+    items:
+      $ref: '#/definitions/serviceModification'
+  ticketReasonWarning:
+    type: object
+    properties:
+      reasonId:
+        type: integer
+      title:
+        type: string
+      text:
+        type: string
+      isSelfcareVisible:
+        type: boolean
+      isDashboardVisible:
+        type: boolean
+      selfTroubleshootFlowId:
+        type: integer
+  ticketReasonWarnings:
+    type: array
+    items:
+      $ref: '#/definitions/ticketReasonWarning'
+  globalTicket:
+    type: object
+    properties:
+      canWatch:
+        type: boolean
+      subscriberId:
+        type: integer
+      ticketCreationDate:
+        type: string
+      childTicketCreationDate:
+        type: string
+      ticketId:
+        type: integer
+      description:
+        type: string
+      title:
+        type: string
+      etrDate:
+        type: string
+      ticketType:
+        type: integer
+      reasonId:
+        type: integer
+  globalTickets:
+    type: array
+    items:
+      $ref: '#/definitions/globalTicket'
+  firstPayment:
+    type: object
+    properties:
+      isFtth:
+        type: boolean
+      isFirstPaymentOnline:
+        type: boolean
+      isPaymentMade:
+        type: boolean
+      isFtthDepositPaid:
+        type: boolean
+      canUserMakeOnlinePayments:
+        type: boolean
+  salesRepresentative:
+    type: object
+    properties:
+      employeeId:
+        type: integer
+      employeeName:
+        type: string
+      employeeErpId:
+        type: string
+  salesRepresentatives:
+    type: array
+    items:
+      $ref: '#/definitions/salesRepresentative'
+  onuDeviceData:
+    type: object
+    properties:
+      active:
+        type: integer
+      onuVendor:
+        type: string
+      onuSerialNumber:
+        type: string
+      onuMacAddress:
+        type: string
+      onuRouterMacAddress:
+        type: string
+      onuDeviceStatus:
+        type: integer
+      accesses:
+        type: object
+        properties:
+          canResetSubscriberMac:
+            type: boolean
+  otpValidationData:
+    type: object
+    properties:
+      userId:
+        type: integer
+      userType:
+        type: integer
+      notificationChannel:
+        type: string
+      notificationChannelValue:
+        type: integer
+      otpValidationType:
+        type: integer
+  reason:
+    type: object
+    properties:
+      reasonId:
+        type: integer
+      title:
+        type: string
+      description:
+        type: string
+      reasonTitle:
+        type: string
+  subscriberReasons:
+    type: array
+    items:
+      $ref: '#/definitions/reason'
+  subscriberListItem:
+    type: object
+    properties:
+      subscriberId:
+        type: integer
+      username:
+        type: string
+      name:
+        type: string
+      partnerId:
+        type: integer
+      email:
+        type: string
+      address:
+        type: string
+      primaryPhone:
+        type: string
+      reasonTitle:
+        type: string
+      erpCreationDate:
+        type: string
+      serviceName:
+        type: string
+      serviceLastRenewalDate:
+        type: string
+      serviceExpirationDate:
+        type: string
+      status:
+        type: string
+      locationRegionId:
+        type: integer
+      locationSubregionId:
+        type: integer
+      refCode:
+        type: string
+      infrastructure:
+        type: string
+      lastUsedPhone:
+        type: string
+      partner:
+        type: string
+  subscriberList:
+    type: array
+    items:
+      $ref: '#/definitions/subscriberListItem'
+  month:
+    type: object
+    properties:
+      id:
+        type: string
+      title:
+        type: string
+      current:
+        type: boolean
+  months:
+    type: array
+    items:
+      $ref: '#/definitions/month'
+  year:
+    type: object
+    properties:
+      id:
+        type: string
+      title:
+        type: string
+      current:
+        type: boolean
+  years:
+    type: array
+    items:
+      $ref: '#/definitions/year'
+  session:
+    type: object
+    properties:
+      sessionId:
+        type: string
+      usageTime:
+        type: number
+        format: float
+      usageVolume:
+        type: number
+        format: float
+      ipAddress:
+        type: string
+      sessionStartDate:
+        type: string
+      sessionEndDate:
+        type: string
+      terminationCause:
+        type: string
+  sessions:
+    type: array
+    items:
+      $ref: '#/definitions/session'
+  subscriberInvoice:
+    type: object
+    properties:
+      purchaseDate:
+        type: string
+      planName:
+        type: string
+      amount:
+        type: number
+        format: float
+      serviceTax:
+        type: number
+        format: float
+      paymentMode:
+        type: string
+      voucherNo:
+        type: string
+      receiptNo:
+        type: string
+        enum: ['Cash', 'Online']
+  subscriberInvoices:
+    type: array
+    items:
+      $ref: '#/definitions/session'
+  partnerEmployee:
+    type: object
+    properties:
+      employeeId:
+        type: integer
+      employeeUsername:
+        type: string
+      employeeErpId:
+        type: integer
+      businessOwner:
+        type: string
+      contactType:
+        type: string
+      employeeName:
+        type: string
+      name:
+        type: string
+      employeePhone:
+        type: string
+      employeeEmail:
+        type: string
+      roleId:
+        type: integer
+      status_id:
+        type: integer
+      lastLoginWeb:
+        type: string
+      lastLoginMobile:
+        type: string
+      employeeRole:
+        type: string
+  partnerEmployeesList:
+    type: array
+    items:
+      $ref: '#/definitions/partnerEmployee'
+  showPaymentMessage:
+    type: boolean
+  isPrimaryPhoneVerificationRequested:
+    type: boolean
+  startPhoneVerificationProcess:
+    type: boolean
+responses:
+  unauthorized:
+    description: Expired session
+    schema:
+      type: object
+      properties:
+        messages:
+          $ref: '#/definitions/messages'
+        status:
+            $ref: '#/definitions/status'
+        success:
+            $ref: '#/definitions/success'
+      required:
+        - messages
+        - status
+        - success
+  invalidInput:
+    description: Invalid input data or some not allowed action
+    schema:
+      type: object
+      properties:
+        messages:
+          $ref: '#/definitions/messages'
+        status:
+            $ref: '#/definitions/status'
+        success:
+            $ref: '#/definitions/success'
+      required:
+        - messages
+        - status
+        - success
+  dataNotFound:
+    description: Data not found based on provided parameters
+    schema:
+      type: object
+      properties:
+        messages:
+          $ref: '#/definitions/messages'
+        status:
+          $ref: '#/definitions/status'
+        success:
+          $ref: '#/definitions/success'
+      required:
+        - messages
+        - status
+        - success
+  invalidERPResponse:
+    description: Response from ERP system is invalid
+    schema:
+      type: object
+      properties:
+        messages:
+          $ref: '#/definitions/messages'
+        status:
+            $ref: '#/definitions/status'
+        success:
+            $ref: '#/definitions/success'
+      required:
+        - messages
+        - status
+        - success
+host: dev-my.excitel.com
+basePath: /api/selfcare/public/index_dev.php/
+schemes:
+ - https
