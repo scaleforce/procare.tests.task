@@ -1,6 +1,3 @@
-import '@bahmutov/cy-api/support';
-
-
 describe("QA Automation Task" , () => {
     let subscriberId = null;
     beforeEach(() => {
