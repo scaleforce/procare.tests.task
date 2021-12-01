@@ -9,5 +9,5 @@
 
 
 
-Swagger documentation (open yaml file on https://editor.swagger.io/) - open selfcare.yaml file
+Swagger documentation (copy the file selfcare.yaml (https://github.com/scaleforce/procare.tests.task/blob/develop/selfcare.yaml) and import it as a file content on https://editor.swagger.io/) 
  
